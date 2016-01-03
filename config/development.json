@@ -1,0 +1,9 @@
+{
+  "uri":{
+    "domain":"local.portal.com",
+    "port":"8080"
+  },
+  "mongodb": {
+    "connection": "mongodb://localhost/test"
+  }
+}
