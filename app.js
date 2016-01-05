@@ -2,9 +2,10 @@ var express = require('express');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
+var passport=require('passport');
 
 var config = require('omsapi-config');
-var routes = require('./routes/index');
+var routes = require('./routes/index')(passport);
 
 var options = {
     server: {
@@ -20,8 +21,11 @@ var options = {
         }
     }
 };
-console.log(config.get('mongodb:connection'));
+
 mongoose.connect(config.get('mongodb:connection'), options);
+
+require('./config/passport/refresh-token-passport')(passport);
+require('./config/passport/temp-access-passport')(passport);
 
 var app = express();
 
@@ -32,6 +36,7 @@ app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 
+app.use(passport.initialize());
 app.use(routes);
 
 // catch 404 and forward to error handler
@@ -49,7 +54,7 @@ if (app.get('env') === 'development') {
     app.use(function (err, req, res, next) {
         res.status(err.status || 500);
         if (res.statusCode === 500) {
-            console.log(require('moment').utc().toString());
+            //console.log(require('moment').utc().toString());
             console.log(err.message);
             console.log(err.stack);
         }

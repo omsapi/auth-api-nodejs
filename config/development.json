@@ -3,6 +3,14 @@
     "domain":"local.portal.com",
     "port":"8080"
   },
+  "token": {
+    "tempAccessSecret": "my temp access secret key",
+    "accessSecret": "my access secret key",
+    "refreshSecret": "my refresh secret key",
+    "accessTimeout": "1800",
+    "refreshTimeout": "604800",
+    "maxSessions": "10"
+  },
   "mongodb": {
     "connection": "mongodb://localhost/test"
   }

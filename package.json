@@ -28,9 +28,14 @@
     "cors": "^2.7.1",
     "debug": "~2.2.0",
     "express": "~4.12.4",
+    "jsonwebtoken": "^5.5.0",
+    "moment": "^2.11.0",
+    "mongoose": "~4.3.4",
     "morgan": "~1.5.3",
-    "omsapi-http-errors": "omsapi/http-errors-nodejs#master",
     "omsapi-config": "omsapi/config-nodejs#master",
-    "mongoose": "~4.3.4"
+    "omsapi-http-errors": "omsapi/http-errors-nodejs#master",
+    "passport": "^0.3.2",
+    "passport-jwt": "^1.2.1",
+    "shortid": "^2.2.4"
   }
 }
