@@ -2,15 +2,38 @@ var config = require('omsapi-config');
 var shortid = require('shortid');
 var jwt = require('jsonwebtoken');
 
+var RefreshToken = require('../models/refreshToken');
+
+function initiate(req, res, next) {
+    var payload = req.payload;
+    RefreshToken.findOneAndUpdate(
+        {_id: payload.userId},
+        {
+            $setOnInsert: {_id: payload.userId}
+        },
+        {
+            new: true,
+            upsert: true
+        },
+        function (err, refreshToken) {
+            if (err) {
+                return next(err);
+            }
+
+            req.refreshToken = refreshToken;
+            next();
+        });
+}
+
 function create(req, res, next) {
     var refreshToken = req.refreshToken;
     var maxSessions = config.getInt('token:maxSessions', 10);
-    var payload = createTokenPayload(refreshToken);
 
     if (refreshToken.tokens.length >= maxSessions) {
         refreshToken.tokens.shift();
     }
 
+    var payload = createTokenPayload(refreshToken);
     refreshToken.tokens.push(payload.token);
 
     createJwt(payload, function (jwt) {
@@ -41,6 +64,7 @@ function removeAll(req, res, next) {
     next();
 }
 
+exports.initiate = initiate;
 exports.create = create;
 exports.remove = remove;
 exports.removeAll = removeAll;

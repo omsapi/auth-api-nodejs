@@ -1,6 +1,7 @@
 var express = require('express');
 var accessToken = require('../middleware/access-token-mw');
 var refreshToken = require('../middleware/refresh-token-mw');
+var tempAccessToken=require('../middleware/temp-access-token-mw');
 
 var router = express.Router();
 
@@ -10,7 +11,9 @@ module.exports = function (passport) {
     });
 
     router.post('/create', [
-        passport.authenticate('temp-access-token', {session: false, assignProperty: 'refreshToken'}),
+        passport.authenticate('temp-access-token', {session: false, assignProperty: 'tempAccessToken'}),
+        tempAccessToken.check,
+        refreshToken.initiate,
         refreshToken.create,
         accessToken.create
     ], function (req, res, next) {
