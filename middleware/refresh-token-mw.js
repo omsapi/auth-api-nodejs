@@ -1,15 +1,23 @@
 var config = require('omsapi-config');
 var shortid = require('shortid');
-var jwt = require('jsonwebtoken');
 
 var RefreshToken = require('../models/refreshToken');
 
-function initiate(req, res, next) {
+function createNew(req, res, next) {
     var payload = req.payload;
+    var token = shortid.generate();
+    var maxSessions = config.getInt('token:maxSessions', 10);
+
     RefreshToken.findOneAndUpdate(
         {_id: payload.userId},
         {
-            $setOnInsert: {_id: payload.userId}
+            $setOnInsert: {_id: payload.userId},
+            $push: {
+                tokens: {
+                    $each: [token],
+                    $slice: -maxSessions
+                }
+            }
         },
         {
             new: true,
@@ -20,26 +28,39 @@ function initiate(req, res, next) {
                 return next(err);
             }
 
+            req.token = token;
             req.refreshToken = refreshToken;
             next();
         });
 }
 
-function create(req, res, next) {
-    var refreshToken = req.refreshToken;
+function update(req, res, next) {
+    var payload = req.payload;
+    var token = shortid.generate();
     var maxSessions = config.getInt('token:maxSessions', 10);
 
-    if (refreshToken.tokens.length >= maxSessions) {
-        refreshToken.tokens.shift();
-    }
+    RefreshToken.findOneAndUpdate(
+        {_id: payload.userId},
+        {
+            $push: {
+                tokens: {
+                    $each: [token],
+                    $slice: -maxSessions
+                }
+            }
+        },
+        {
+            new: true
+        },
+        function (err, refreshToken) {
+            if (err) {
+                return next(err);
+            }
 
-    var payload = createTokenPayload(refreshToken);
-    refreshToken.tokens.push(payload.token);
-
-    createJwt(payload, function (jwt) {
-        res.locals.refreshJwt = jwt;
-        next();
-    });
+            req.token = token;
+            req.refreshToken = refreshToken;
+            next();
+        });
 }
 
 function remove(req, res, next) {
@@ -64,21 +85,7 @@ function removeAll(req, res, next) {
     next();
 }
 
-exports.initiate = initiate;
-exports.create = create;
+exports.createNew = createNew;
+exports.update = update;
 exports.remove = remove;
 exports.removeAll = removeAll;
-
-
-function createTokenPayload(refreshToken) {
-    return {
-        token: shortid.generate(),
-        userId: refreshToken._id
-    };
-}
-
-function createJwt(payload, callback) {
-    var refreshSecret = config.get("token:refreshSecret");
-    var refreshTimeout = config.getInt("token:refreshTimeout");
-    jwt.sign(payload, refreshSecret, {expiresIn: refreshTimeout}, callback);
-}

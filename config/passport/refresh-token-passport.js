@@ -9,17 +9,26 @@ module.exports = function (passport) {
             secretOrKey: config.get('token:refreshSecret'),
             passReqToCallback: true
         }, function (req, payload, done) {
-            RefreshToken.findOne({_id: payload.userId, tokens: payload.token}, function (err, refreshToken) {
-                if (err) {
-                    return done(err);
-                }
+            //TODO: Move to MW as remove
+            RefreshToken.findOneAndUpdate(
+                {_id: payload.userId, tokens: payload.token},
+                {
+                    $pullAll: {tokens: [payload.token]}
+                },
+                {
+                    new: true
+                },
+                function (err, refreshToken) {
+                    if (err) {
+                        return done(err);
+                    }
 
-                if (refreshToken) {
-                    req.payload = payload;
-                    return done(null, refreshToken);
-                }
+                    if (refreshToken) {
+                        req.payload = payload;
+                        return done(null, refreshToken);
+                    }
 
-                done(null, false);
-            });
+                    done(null, false);
+                });
         }));
 };
