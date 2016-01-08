@@ -1,6 +1,6 @@
 {
   "name": "omsapi-jwt-api",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "app.js",
   "description": "JWT micro-service on Node.js",
   "scripts": {
