@@ -34,35 +34,6 @@ function createNew(req, res, next) {
         });
 }
 
-function update(req, res, next) {
-    var payload = req.payload;
-    var token = shortid.generate();
-    var maxSessions = config.getInt('token:maxSessions', 10);
-
-    RefreshToken.findOneAndUpdate(
-        {_id: payload.userId},
-        {
-            $push: {
-                tokens: {
-                    $each: [token],
-                    $slice: -maxSessions
-                }
-            }
-        },
-        {
-            new: true
-        },
-        function (err, refreshToken) {
-            if (err) {
-                return next(err);
-            }
-
-            req.token = token;
-            req.refreshToken = refreshToken;
-            next();
-        });
-}
-
 function remove(req, res, next) {
     var refreshToken = req.refreshToken;
     var payload = req.payload;
@@ -86,6 +57,5 @@ function removeAll(req, res, next) {
 }
 
 exports.createNew = createNew;
-exports.update = update;
 exports.remove = remove;
 exports.removeAll = removeAll;

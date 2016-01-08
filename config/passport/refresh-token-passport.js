@@ -1,4 +1,5 @@
 var JwtStrategy = require('passport-jwt').Strategy;
+var shortid = require('shortid');
 var config = require('omsapi-config');
 
 var RefreshToken = require('../../models/refreshToken');
@@ -10,10 +11,11 @@ module.exports = function (passport) {
             passReqToCallback: true
         }, function (req, payload, done) {
             //TODO: Move to MW as remove
+            var token = shortid.generate();
             RefreshToken.findOneAndUpdate(
                 {_id: payload.userId, tokens: payload.token},
                 {
-                    $pullAll: {tokens: [payload.token]}
+                    $set: {'tokens.$': token}
                 },
                 {
                     new: true
@@ -24,7 +26,7 @@ module.exports = function (passport) {
                     }
 
                     if (refreshToken) {
-                        req.payload = payload;
+                        req.token = token;
                         return done(null, refreshToken);
                     }
 

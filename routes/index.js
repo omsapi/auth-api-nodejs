@@ -30,7 +30,6 @@ module.exports = function (passport) {
 
     router.get('/refresh', [
         passport.authenticate('refresh-token', {session: false, assignProperty: 'refreshToken'}),
-        refreshToken.update,
         refreshJwt.create,
         accessToken.create
     ], function (req, res, next) {
