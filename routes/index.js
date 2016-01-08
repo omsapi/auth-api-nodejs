@@ -18,14 +18,8 @@ module.exports = function (passport) {
         refreshJwt.create,
         accessToken.create
     ], function (req, res, next) {
-        req.refreshToken.save(function (err) {
-            if (err) {
-                return next(err);
-            }
-
-            res.status(201);
-            sendTokens(res);
-        });
+        res.status(201);
+        sendTokens(res);
     });
 
     router.get('/refresh', [
@@ -33,13 +27,7 @@ module.exports = function (passport) {
         refreshJwt.create,
         accessToken.create
     ], function (req, res, next) {
-        req.refreshToken.save(function (err) {
-            if (err) {
-                return next(err);
-            }
-
-            sendTokens(res);
-        });
+        sendTokens(res);
     });
 
     router.delete('/', [

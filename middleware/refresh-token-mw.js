@@ -1,5 +1,6 @@
 var config = require('omsapi-config');
 var shortid = require('shortid');
+var moment = require('moment');
 
 var RefreshToken = require('../models/refreshToken');
 
@@ -11,7 +12,10 @@ function createNew(req, res, next) {
     RefreshToken.findOneAndUpdate(
         {_id: payload.userId},
         {
-            $setOnInsert: {_id: payload.userId},
+            $setOnInsert: {
+                _id: payload.userId,
+                created: moment.utc()
+            },
             $push: {
                 tokens: {
                     $each: [token],

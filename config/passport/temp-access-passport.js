@@ -1,4 +1,5 @@
 var JwtStrategy = require('passport-jwt').Strategy;
+var moment = require('moment');
 var config = require('omsapi-config');
 
 var TempAccessToken = require('../../models/tempAccessToken');
@@ -12,7 +13,10 @@ module.exports = function (passport) {
             TempAccessToken.findOneAndUpdate(
                 {_id: payload.userId},
                 {
-                    $setOnInsert: {_id: payload.userId},
+                    $setOnInsert: {
+                        _id: payload.userId,
+                        created: moment.utc()
+                    },
                     $push: {
                         expired: {
                             $each: [payload.exp],
