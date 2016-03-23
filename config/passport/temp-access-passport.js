@@ -1,4 +1,5 @@
 var JwtStrategy = require('passport-jwt').Strategy;
+var ExtractJwt = require('passport-jwt').ExtractJwt;
 var moment = require('moment');
 var config = require('omsapi-config');
 
@@ -8,7 +9,8 @@ module.exports = function (passport) {
     passport.use('temp-access-token',
         new JwtStrategy({
             secretOrKey: config.get('token:tempAccessSecret'),
-            passReqToCallback: true
+            passReqToCallback: true,
+            jwtFromRequest: ExtractJwt.fromAuthHeader()
         }, function (req, payload, done) {
             TempAccessToken.findOneAndUpdate(
                 {_id: payload.userId},
@@ -35,8 +37,8 @@ module.exports = function (passport) {
                     }
 
                     // When create document
-                    if(!tempAccessToken){
-                        tempAccessToken=new TempAccessToken({
+                    if (!tempAccessToken) {
+                        tempAccessToken = new TempAccessToken({
                             _id: payload.userId,
                             expired: [0]
                         });

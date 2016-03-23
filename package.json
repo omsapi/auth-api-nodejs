@@ -1,6 +1,6 @@
 {
   "name": "omsapi-jwt-api",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "app.js",
   "description": "JWT micro-service on Node.js",
   "scripts": {
@@ -35,7 +35,7 @@
     "omsapi-config": "omsapi/config-nodejs#master",
     "omsapi-http-errors": "omsapi/http-errors-nodejs#master",
     "passport": "^0.3.2",
-    "passport-jwt": "^1.2.1",
+    "passport-jwt": "^2.0.0",
     "shortid": "^2.2.4"
   }
 }

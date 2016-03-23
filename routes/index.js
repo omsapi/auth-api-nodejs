@@ -23,7 +23,7 @@ module.exports = function (passport) {
     });
 
     router.get('/refresh', [
-        passport.authenticate('refresh-token', {session: false, assignProperty: 'refreshToken'}),
+        passport.authenticate('refresh-update', {session: false, assignProperty: 'refreshToken'}),
         refreshJwt.create,
         accessToken.create
     ], function (req, res, next) {
@@ -31,29 +31,15 @@ module.exports = function (passport) {
     });
 
     router.delete('/', [
-        passport.authenticate('refresh-token', {session: false, assignProperty: 'refreshToken'}),
-        refreshToken.remove
+        passport.authenticate('refresh-remove', {session: false, assignProperty: 'refreshToken'}),
     ], function (req, res, next) {
-        req.refreshToken.save(function (err) {
-            if (err) {
-                return next(err);
-            }
-
-            res.send();
-        });
+        res.send();
     });
 
     router.delete('/all', [
-        passport.authenticate('refresh-token', {session: false, assignProperty: 'refreshToken'}),
-        refreshToken.removeAll
+        passport.authenticate('refresh-remove-all', {session: false, assignProperty: 'refreshToken'}),
     ], function (req, res, next) {
-        req.refreshToken.save(function (err) {
-            if (err) {
-                return next(err);
-            }
-
-            res.send();
-        });
+        res.send();
     });
 
     return router;
